@@ -47,6 +47,7 @@ class ProductController extends Controller
         $product->price = $request->price;
         $product->category_id = $request->category_id; 
         $product->supplier_id = $request->supplier_id; // ĐÃ SỬA: Lưu ID nhà cung cấp
+        $product->requires_installation = $request->has('requires_installation');
         
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -85,6 +86,7 @@ class ProductController extends Controller
         $product->price = $request->price;
         $product->category_id = $request->category_id; 
         $product->supplier_id = $request->supplier_id; // ĐÃ SỬA: Cập nhật ID nhà cung cấp
+        $product->requires_installation = $request->has('requires_installation');
         $product->description = $request->description;
         $product->specifications = $request->specifications;
 

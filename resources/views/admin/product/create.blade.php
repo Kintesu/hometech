@@ -39,6 +39,11 @@
                     </select>
                 </div>
 
+                <div class="form-group form-check">
+                    <input type="checkbox" name="requires_installation" value="1" class="form-check-input" id="requiresInstallation">
+                    <label class="form-check-label" for="requiresInstallation">Sản phẩm yêu cầu giao hàng/lắp đặt</label>
+                </div>
+
                 <div class="form-group">
                     <label>Mô tả sản phẩm</label>
                     <textarea name="description" class="form-control" rows="4" placeholder="Nhập mô tả giới thiệu...">{{ isset($product) ? $product->description : '' }}</textarea>

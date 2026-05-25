@@ -61,6 +61,12 @@
                     <span>Quản lý Kho</span></a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link" href="/quantri/phan-quyen">
+                    <i class="fas fa-fw fa-user-shield"></i>
+                    <span>Phân quyền</span></a>
+            </li>
+
             <hr class="sidebar-divider d-none d-md-block">
 
             <div class="text-center d-none d-md-inline">

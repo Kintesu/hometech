@@ -12,8 +12,14 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         // Nếu đã đăng nhập rồi thì đẩy thẳng vào dashboard
-        if (Auth::check() && in_array(Auth::user()->role, ['Admin', 'Staff'])) {
+        if (Auth::check() && Auth::user()->role === 'Admin') {
             return redirect('/quantri');
+        }
+        if (Auth::check() && Auth::user()->role === 'StaffWarehouse') {
+            return redirect('/kho/xuat-kho');
+        }
+        if (Auth::check() && Auth::user()->role === 'StaffTech') {
+            return redirect('/lap-dat');
         }
         return view('admin.login');
     }
@@ -31,13 +37,24 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             
-            // Kiểm tra quyền (Chỉ Admin hoặc Staff mới được vào)
-            if ($user->role == 'Admin' || $user->role == 'Staff') {
+            if ($user->role === 'Admin') {
                 return redirect('/quantri');
-            } else {
-                Auth::logout();
-                return back()->withErrors(['error' => 'Tài khoản không có quyền truy cập quản trị.']);
             }
+
+            if ($user->role === 'StaffSales') {
+                return redirect(url('/pos'));
+            }
+
+            if ($user->role === 'StaffWarehouse') {
+                return redirect('/kho/xuat-kho');
+            }
+
+            if ($user->role === 'StaffTech') {
+                return redirect('/lap-dat');
+            }
+
+            Auth::logout();
+            return back()->withErrors(['error' => 'Tài khoản không có quyền truy cập quản trị.']);
         }
 
         // Đăng nhập thất bại
@@ -49,5 +66,39 @@ class AuthController extends Controller
     {
         Auth::logout();
         return redirect('/quantri/login');
+    }
+
+    public function showPosLoginForm()
+    {
+        if (Auth::check() && Auth::user()->role === 'StaffSales') {
+            return redirect(url('/pos'));
+        }
+
+        return view('pos.login');
+    }
+
+    public function posLogin(Request $request)
+    {
+        $credentials = [
+            'username' => $request->username,
+            'password' => $request->password,
+        ];
+
+        if (Auth::attempt($credentials)) {
+            if (Auth::user()->role === 'StaffSales') {
+                return redirect(url('/pos'));
+            }
+
+            Auth::logout();
+            return back()->withErrors(['error' => 'Tài khoản chưa được Admin phân quyền POS.']);
+        }
+
+        return back()->withErrors(['error' => 'Tên đăng nhập hoặc mật khẩu không chính xác.']);
+    }
+
+    public function posLogout()
+    {
+        Auth::logout();
+        return redirect(url('/pos/login'));
     }
 }

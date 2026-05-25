@@ -11,6 +11,16 @@
         </div>
     </div>
 
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+    @if($errors->any())
+        <div class="alert alert-danger">{{ $errors->first() }}</div>
+    @endif
+
     <div class="row">
         <div class="col-lg-6">
             <div class="card shadow mb-4">
@@ -37,14 +47,30 @@
                             <td><strong>Trạng thái:</strong></td>
                             <td>
                                 @if($order->status == 'Pending') <span class="badge badge-warning">Chờ xử lý</span>
-                                @elseif($order->status == 'Confirmed') <span class="badge badge-info">Đã xác nhận</span>
                                 @elseif($order->status == 'Shipping') <span class="badge badge-primary">Đang giao hàng</span>
                                 @elseif($order->status == 'Completed') <span class="badge badge-success">Đã hoàn thành</span>
+                                @elseif($order->status == 'InstallationFailed') <span class="badge badge-danger">Lắp đặt thất bại</span>
                                 @elseif($order->status == 'Canceled') <span class="badge badge-danger">Đã hủy</span>
                                 @else <span class="badge badge-secondary">{{ $order->status }}</span>
                                 @endif
                             </td>
                         </tr>
+                        @if(!is_null($order->received_amount))
+                        <tr>
+                            <td><strong>Tiền khách đưa:</strong></td>
+                            <td>{{ number_format($order->received_amount, 0, ',', '.') }} đ</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tiền thối:</strong></td>
+                            <td>{{ number_format($order->change_amount ?? 0, 0, ',', '.') }} đ</td>
+                        </tr>
+                        @endif
+                        @if(!empty($order->delivery_address))
+                        <tr>
+                            <td><strong>Địa chỉ giao/lắp:</strong></td>
+                            <td>{{ $order->delivery_address }}</td>
+                        </tr>
+                        @endif
                     </table>
                 </div>
             </div>
@@ -59,11 +85,11 @@
                     <table class="table table-borderless table-sm">
                         <tr>
                             <td width="30%"><strong>Họ và tên:</strong></td>
-                            <td>{{ $order->user ? $order->user->name : 'Khách vãng lai' }}</td>
+                            <td>{{ $order->user ? $order->user->full_name : 'Khách vãng lai' }}</td>
                         </tr>
                         <tr>
-                            <td><strong>Email:</strong></td>
-                            <td>{{ $order->user ? $order->user->email : 'N/A' }}</td>
+                            <td><strong>Tên đăng nhập:</strong></td>
+                            <td>{{ $order->user ? $order->user->username : 'N/A' }}</td>
                         </tr>
                         <tr>
                             <td><strong>Điện thoại:</strong></td>
@@ -92,6 +118,7 @@
                             <th width="15%">Mã SP</th>
                             <th width="35%" class="text-left">Tên sản phẩm</th>
                             <th width="15%">Số lượng</th>
+                            <th width="15%">Tồn kho hiện tại</th>
                             <th width="15%">Đơn giá</th>
                             <th width="15%">Thành tiền</th>
                         </tr>
@@ -105,19 +132,28 @@
                                 <td>SP-{{ $item->product_id }}</td>
                                 <td class="text-left font-weight-bold">{{ $item->product ? $item->product->name : 'Sản phẩm không tồn tại' }}</td>
                                 <td>{{ $item->quantity }}</td>
+                                <td>
+                                    @if($item->product)
+                                        <span class="{{ $item->product->stock_quantity < $item->quantity ? 'text-danger font-weight-bold' : '' }}">
+                                            {{ $item->product->stock_quantity }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">N/A</span>
+                                    @endif
+                                </td>
                                 <td>{{ number_format($item->unit_price, 0, ',', '.') }} đ</td>
                                 <td class="text-danger font-weight-bold">{{ number_format($item->quantity * $item->unit_price, 0, ',', '.') }} đ</td>
                             </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="6" class="text-center">Chưa có dữ liệu chi tiết cho đơn hàng này.</td>
+                                <td colspan="7" class="text-center">Chưa có dữ liệu chi tiết cho đơn hàng này.</td>
                             </tr>
                         @endif
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="5" class="text-right h5 mb-0">TỔNG CỘNG:</th>
+                            <th colspan="6" class="text-right h5 mb-0">TỔNG CỘNG:</th>
                             <th class="text-danger h5 mb-0">{{ number_format($order->total_price, 0, ',', '.') }} đ</th>
                         </tr>
                     </tfoot>

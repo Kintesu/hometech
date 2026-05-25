@@ -218,6 +218,47 @@
                             <div class="header-ctn">
 
                                 <!-- WISHLIST -->
+                                <div class="dropdown">
+                                    @auth
+                                        <a href="#"
+                                           class="dropdown-toggle"
+                                           data-toggle="dropdown"
+                                           role="button"
+                                           aria-expanded="false"
+                                           style="cursor: pointer;">
+                                            <i class="fa fa-user-o"></i>
+                                            <span>{{ Auth::user()->full_name }}</span>
+                                        </a>
+
+                                        <div class="dropdown-menu dropdown-menu-right" style="min-width: 190px; padding: 8px 0;">
+                                            <div style="padding: 8px 16px; color: #2b2d42; font-weight: 600;">
+                                                <i class="fa fa-user-o"></i>
+                                                {{ Auth::user()->full_name }}
+                                            </div>
+                                            <div class="divider" style="margin: 4px 0;"></div>
+                                            <a href="/tai-khoan"
+                                               class="dropdown-item"
+                                               style="display: block; padding: 8px 16px; color: #2b2d42;">
+                                                <i class="fa fa-id-card-o"></i> Thông tin cá nhân
+                                            </a>
+                                            <a href="{{ route('customer.logout') }}"
+                                               class="dropdown-item"
+                                               style="display: block; padding: 8px 16px; color: #2b2d42;"
+                                               onclick="event.preventDefault(); document.getElementById('customer-logout-form').submit();">
+                                                <i class="fa fa-sign-out"></i> Đăng xuất
+                                            </a>
+                                            <form id="customer-logout-form" method="POST" action="{{ route('customer.logout') }}" style="display: none;">
+                                                @csrf
+                                            </form>
+                                        </div>
+                                    @else
+                                        <a href="/dang-nhap">
+                                            <i class="fa fa-user-o"></i>
+                                            <span>Đăng nhập</span>
+                                        </a>
+                                    @endauth
+                                </div>
+
                                 <div>
                                     <a href="/yeu-thich">
                                         <i class="fa fa-heart-o"></i>

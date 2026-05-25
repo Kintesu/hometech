@@ -8,7 +8,12 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\WarehouseController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PosController;
+use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\Admin\WarehouseShipmentController;
+use App\Http\Controllers\Admin\InstallationController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CustomerAuthController;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -20,6 +25,24 @@ use Carbon\Carbon;
 */
 // Gọi hàm index của HomeController khi người dùng vào trang chủ
 Route::get('/', [HomeController::class, 'index']);
+Route::get('/san-pham/{id}', [HomeController::class, 'detail']);
+Route::get('/tim-kiem', [HomeController::class, 'search']);
+
+// Tài khoản khách hàng
+Route::get('/dang-nhap', [CustomerAuthController::class, 'showLoginForm'])->name('customer.login');
+Route::post('/dang-nhap', [CustomerAuthController::class, 'login']);
+Route::get('/dang-ky', [CustomerAuthController::class, 'showRegisterForm'])->name('customer.register');
+Route::post('/dang-ky', [CustomerAuthController::class, 'register']);
+Route::post('/dang-xuat', [CustomerAuthController::class, 'logout'])->name('customer.logout');
+Route::middleware('auth')->group(function () {
+    Route::get('/tai-khoan', [CustomerAuthController::class, 'profile'])->name('customer.profile');
+    Route::post('/tai-khoan', [CustomerAuthController::class, 'updateProfile']);
+});
+
+// Giỏ hàng
+Route::post('/gio-hang/them/{id}', [CartController::class, 'add']);
+Route::get('/gio-hang', [CartController::class, 'index']);
+Route::get('/gio-hang/xoa/{id}', [CartController::class, 'remove']);
 
 
 /*
@@ -32,8 +55,32 @@ Route::get('/quantri/login', [AuthController::class, 'showLoginForm'])->name('lo
 Route::post('/quantri/login', [AuthController::class, 'login']);
 Route::get('/quantri/logout', [AuthController::class, 'logout']);
 
+Route::get('/pos/login', [AuthController::class, 'showPosLoginForm'])->name('pos.login');
+Route::post('/pos/login', [AuthController::class, 'posLogin']);
+Route::get('/pos/logout', [AuthController::class, 'posLogout']);
+
+Route::middleware(['auth', 'pos'])->group(function () {
+    Route::get('/pos', [PosController::class, 'index']);
+    Route::get('/pos/products', [PosController::class, 'searchProducts']);
+    Route::post('/pos/orders', [PosController::class, 'store']);
+    Route::get('/pos/orders/{id}/receipt', [PosController::class, 'receipt']);
+});
+
+Route::middleware(['auth', 'warehouse'])->group(function () {
+    Route::get('/kho/xuat-kho', [WarehouseShipmentController::class, 'index']);
+    Route::get('/kho/xuat-kho/{id}', [WarehouseShipmentController::class, 'show']);
+    Route::post('/kho/xuat-kho/{id}', [WarehouseShipmentController::class, 'confirm']);
+    Route::post('/kho/tu-choi-xuat-kho/{id}', [WarehouseShipmentController::class, 'reject']);
+});
+
+Route::middleware(['auth', 'tech'])->group(function () {
+    Route::get('/lap-dat', [InstallationController::class, 'index']);
+    Route::get('/lap-dat/{id}', [InstallationController::class, 'show']);
+    Route::post('/lap-dat/{id}/trang-thai', [InstallationController::class, 'updateStatus']);
+});
+
 // BỌC MIDDLEWARE: Các route bắt buộc phải đăng nhập mới vào được
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () {
     
         Route::get('/quantri', function () {
         $now = Carbon::now();
@@ -44,10 +91,12 @@ Route::middleware(['auth'])->group(function () {
         $doanhThuThang = DB::table('orders')
             ->whereMonth('order_date', $now->month) // Đã sửa thành order_date
             ->whereYear('order_date', $now->year)
+            ->where('status', 'Completed')
             ->sum('total_price'); // Đã sửa thành total_price
 
         $doanhThuNam = DB::table('orders')
             ->whereYear('order_date', $now->year)
+            ->where('status', 'Completed')
             ->sum('total_price');
 
         $donHangCho = DB::table('orders')
@@ -68,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
         $monthlyRevenues = DB::table('orders')
             ->select(DB::raw('MONTH(order_date) as month'), DB::raw('SUM(total_price) as total'))
             ->whereYear('order_date', $now->year)
+            ->where('status', 'Completed')
             ->groupBy('month')
             ->pluck('total', 'month');
 
@@ -81,7 +131,10 @@ Route::middleware(['auth'])->group(function () {
         for ($i = 4; $i >= 0; $i--) {
             $year = $now->year - $i;
             $yearlyLabels[] = (string)$year;
-            $total = DB::table('orders')->whereYear('order_date', $year)->sum('total_price');
+            $total = DB::table('orders')
+                ->whereYear('order_date', $year)
+                ->where('status', 'Completed')
+                ->sum('total_price');
             $yearlyData[] = $total;
         }
 
@@ -150,19 +203,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/quantri/don-hang', [OrderController::class, 'index']);
     Route::get('/quantri/don-hang/chi-tiet/{id}', [OrderController::class, 'show']);
     Route::post('/quantri/don-hang/cap-nhat/{id}', [OrderController::class, 'updateStatus']);
-
-    // TRANG KHÁCH HÀNG (FRONTEND)
-    Route::get('/', [HomeController::class, 'index']);
-    // THÊM DÒNG NÀY: Dùng {id} để biết khách đang bấm vào sản phẩm số mấy
-    Route::get('/san-pham/{id}', [HomeController::class, 'detail']);
-
-    // ROUTE GIỎ HÀNG
-    Route::post('/gio-hang/them/{id}', [CartController::class, 'add']); // Bấm nút thêm vào giỏ
-    Route::get('/gio-hang', [CartController::class, 'index']);          // Xem trang giỏ hàng
-    Route::get('/gio-hang/xoa/{id}', [CartController::class, 'remove']);// Xóa 1 sản phẩm khỏi giỏ
-
-    // Route Tìm kiếm sản phẩm
-    Route::get('/tim-kiem', [App\Http\Controllers\HomeController::class, 'search']);
-
+    Route::get('/quantri/phan-quyen', [UserRoleController::class, 'index']);
+    Route::post('/quantri/phan-quyen/{id}', [UserRoleController::class, 'update']);
     // Sau này các route Quản lý sản phẩm, đơn hàng... sẽ đặt hết ở trong khối này
 });
