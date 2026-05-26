@@ -113,6 +113,14 @@
                 transform: scale(1.12);
             }
 
+            .feature-pending,
+            .feature-pending:hover,
+            .feature-pending:focus {
+                cursor: not-allowed !important;
+                opacity: 0.65;
+                text-decoration: none;
+            }
+
             @media only screen and (max-width: 767px) {
                 .floating-contact {
                     right: 15px;
@@ -151,7 +159,11 @@
                 <span class="contact-label">Gửi phản hồi</span>
             </a>
 
-            <a href="#" class="contact-item address" title="Địa chỉ cửa hàng">
+            <a href="https://www.google.com/maps/search/?api=1&query=Ha+Noi+Viet+Nam"
+               class="contact-item address"
+               title="Địa chỉ cửa hàng"
+               target="_blank"
+               rel="noopener">
                 <i class="fa fa-map-marker"></i>
                 <span class="contact-label">Địa chỉ cửa hàng</span>
             </a>
@@ -217,7 +229,6 @@
                         <div class="col-md-3 clearfix">
                             <div class="header-ctn">
 
-                                <!-- WISHLIST -->
                                 <div class="dropdown">
                                     @auth
                                         <a href="#"
@@ -258,15 +269,6 @@
                                         </a>
                                     @endauth
                                 </div>
-
-                                <div>
-                                    <a href="/yeu-thich">
-                                        <i class="fa fa-heart-o"></i>
-                                        <span>Yêu thích</span>
-                                        <div class="qty">0</div>
-                                    </a>
-                                </div>
-                                <!-- /WISHLIST -->
 
                                 <!-- CART -->
                                 <div class="dropdown">
@@ -326,7 +328,10 @@
 
                                         <div class="cart-btns">
                                             <a href="/gio-hang">Xem giỏ hàng</a>
-                                            <a href="/thanh-toan">
+                                            <a href="#"
+                                               class="feature-pending"
+                                               title="Chức năng thanh toán đang cập nhật"
+                                               onclick="return false;">
                                                 Thanh toán <i class="fa fa-arrow-circle-right"></i>
                                             </a>
                                         </div>
@@ -363,7 +368,7 @@
                         </li>
 
                         <li>
-                            <a href="#">Khuyến mãi</a>
+                            <a href="/tim-kiem?discount=1">Khuyến mãi</a>
                         </li>
 
                         <li class="{{ request('category_id') == 1 ? 'active' : '' }}">
@@ -389,42 +394,6 @@
         
         @yield('content')
         
-        <!-- NEWSLETTER -->
-        <div id="newsletter" class="section">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="newsletter">
-                            <p>Đăng ký nhận <strong>KHUYẾN MÃI MỚI NHẤT</strong></p>
-
-                            <form>
-                                <input class="input" type="email" placeholder="Nhập email của bạn">
-
-                                <button class="newsletter-btn">
-                                    <i class="fa fa-envelope"></i> Đăng ký
-                                </button>
-                            </form>
-
-                            <ul class="newsletter-follow">
-                                <li>
-                                    <a href="#"><i class="fa fa-facebook"></i></a>
-                                </li>
-
-                                <li>
-                                    <a href="#"><i class="fa fa-twitter"></i></a>
-                                </li>
-
-                                <li>
-                                    <a href="#"><i class="fa fa-instagram"></i></a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- /NEWSLETTER -->
-
         <!-- FOOTER -->
         <footer id="footer">
             <div class="section">
@@ -440,7 +409,9 @@
 
                                 <ul class="footer-links">
                                     <li>
-                                        <a href="#">
+                                        <a href="https://www.google.com/maps/search/?api=1&query=Ha+Noi+Viet+Nam"
+                                           target="_blank"
+                                           rel="noopener">
                                             <i class="fa fa-map-marker"></i>Hà Nội, Việt Nam
                                         </a>
                                     </li>

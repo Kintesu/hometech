@@ -14,7 +14,7 @@ class EnsurePosStaff
         if (!Auth::check() || Auth::user()->role !== 'StaffSales') {
             Auth::logout();
 
-            return redirect(url('/pos/login'))
+            return redirect('/quantri/login')
                 ->withErrors(['error' => 'Tài khoản không có quyền truy cập POS.']);
         }
 

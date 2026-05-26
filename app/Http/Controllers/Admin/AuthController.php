@@ -11,16 +11,14 @@ class AuthController extends Controller
     // Hiển thị form đăng nhập
     public function showLoginForm()
     {
-        // Nếu đã đăng nhập rồi thì đẩy thẳng vào dashboard
-        if (Auth::check() && Auth::user()->role === 'Admin') {
-            return redirect('/quantri');
+        if (Auth::check()) {
+            $redirect = $this->redirectByRole(Auth::user()->role);
+
+            if ($redirect) {
+                return redirect($redirect);
+            }
         }
-        if (Auth::check() && Auth::user()->role === 'StaffWarehouse') {
-            return redirect('/kho/xuat-kho');
-        }
-        if (Auth::check() && Auth::user()->role === 'StaffTech') {
-            return redirect('/lap-dat');
-        }
+
         return view('admin.login');
     }
 
@@ -36,21 +34,11 @@ class AuthController extends Controller
         // Thực hiện kiểm tra với Database
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            
-            if ($user->role === 'Admin') {
-                return redirect('/quantri');
-            }
 
-            if ($user->role === 'StaffSales') {
-                return redirect(url('/pos'));
-            }
+            $redirect = $this->redirectByRole($user->role);
 
-            if ($user->role === 'StaffWarehouse') {
-                return redirect('/kho/xuat-kho');
-            }
-
-            if ($user->role === 'StaffTech') {
-                return redirect('/lap-dat');
+            if ($redirect) {
+                return redirect($redirect);
             }
 
             Auth::logout();
@@ -99,6 +87,17 @@ class AuthController extends Controller
     public function posLogout()
     {
         Auth::logout();
-        return redirect(url('/pos/login'));
+        return redirect('/quantri/login');
+    }
+
+    private function redirectByRole(?string $role): ?string
+    {
+        return match ($role) {
+            'Admin' => '/quantri',
+            'StaffSales' => '/pos',
+            'StaffWarehouse' => '/kho/xuat-kho',
+            'StaffTech' => '/lap-dat',
+            default => null,
+        };
     }
 }

@@ -9,7 +9,7 @@
             <div class="col-md-12">
                 <ul class="breadcrumb-tree">
                     <li><a href="/">Trang chủ</a></li>
-                    <li><a href="#">Sản phẩm</a></li>
+                    <li><a href="/tim-kiem">Sản phẩm</a></li>
                     <li class="active">{{ $product->name }}</li>
                 </ul>
             </div>

@@ -75,7 +75,11 @@
             @if(session('cart') && count(session('cart')) > 0)
             <div class="col-md-12 text-right mt-4">
                 <a href="/" class="btn btn-default" style="border: 1px solid #ccc; padding: 10px 20px;">TIẾP TỤC MUA SẮM</a>
-                <a href="#" class="btn btn-danger" style="padding: 10px 20px; font-weight: bold;">TIẾN HÀNH THANH TOÁN</a>
+                <a href="#"
+                   class="btn btn-danger feature-pending"
+                   style="padding: 10px 20px; font-weight: bold;"
+                   title="Chức năng thanh toán đang cập nhật"
+                   onclick="return false;">TIẾN HÀNH THANH TOÁN</a>
             </div>
             @endif
 

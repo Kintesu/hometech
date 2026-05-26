@@ -12,9 +12,9 @@
                     <h3 class="title">Sản Phẩm Mới Nhất</h3>
                     <div class="section-nav">
                         <ul class="section-tab-nav tab-nav">
-                            <li class="active"><a href="#">Tất cả</a></li>
-                            <li><a href="#">Tủ lạnh</a></li>
-                            <li><a href="#">Máy giặt</a></li>
+                            <li class="active"><a href="/">Tất cả</a></li>
+                            <li><a href="/tim-kiem?category_id=1">Tủ lạnh</a></li>
+                            <li><a href="/tim-kiem?category_id=3">Máy giặt</a></li>
                         </ul>
                     </div>
                 </div>

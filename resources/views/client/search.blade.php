@@ -22,7 +22,7 @@
             <div class="col-md-12">
                 <div class="section-title">
                     <h3 class="title">
-                        Kết quả tìm kiếm 
+                        {{ $discount ? 'Sản phẩm khuyến mãi' : 'Kết quả tìm kiếm' }}
                         @if(!empty($keyword)) cho: "<span class="text-danger">{{ $keyword }}</span>" @endif
                     </h3>
                     <p>Tìm thấy {{ $products->total() }} sản phẩm phù hợp.</p>

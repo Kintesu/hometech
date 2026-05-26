@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product; // Đừng quên gọi Model Product vào nhé
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class HomeController extends Controller
 {
@@ -38,6 +39,7 @@ class HomeController extends Controller
         // 1. Lấy dữ liệu người dùng gửi lên từ thanh tìm kiếm
         $keyword = $request->input('keyword');
         $category_id = $request->input('category_id');
+        $discount = $request->boolean('discount');
 
         // 2. Bắt đầu truy vấn
         $query = Product::orderBy('id', 'desc');
@@ -52,10 +54,28 @@ class HomeController extends Controller
             $query->where('category_id', $category_id);
         }
 
-        // 3. Phân trang (Hiển thị 12 sản phẩm/trang)
-        $products = $query->paginate(12);
+        if ($discount) {
+            $page = LengthAwarePaginator::resolveCurrentPage();
+            $discountedProducts = $query->get()->filter(function ($product) {
+                return $product->discount_percent > 0;
+            })->values();
+
+            $products = new LengthAwarePaginator(
+                $discountedProducts->forPage($page, 12),
+                $discountedProducts->count(),
+                12,
+                $page,
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query(),
+                ]
+            );
+        } else {
+            // 3. Phân trang (Hiển thị 12 sản phẩm/trang)
+            $products = $query->paginate(12);
+        }
 
         // 4. Trả về view kết quả tìm kiếm
-        return view('client.search', compact('products', 'keyword'));
+        return view('client.search', compact('products', 'keyword', 'discount'));
     }
 }
