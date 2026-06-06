@@ -371,6 +371,10 @@
                             <a href="/tim-kiem?discount=1">Khuyến mãi</a>
                         </li>
 
+                        <li class="{{ request()->is('tra-cuu-bao-hanh') ? 'active' : '' }}">
+                            <a href="{{ route('warranty.lookup') }}">Tra cứu bảo hành</a>
+                        </li>
+
                         <li class="{{ request('category_id') == 1 ? 'active' : '' }}">
                             <a href="/tim-kiem?category_id=1">Tủ lạnh</a>
                         </li>

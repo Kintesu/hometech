@@ -10,7 +10,12 @@ class Product extends Model
     protected $table = 'products';
 
     // Tắt tự động quản lý thời gian nếu bảng không có created_at, updated_at
-    public $timestamps = false; 
+    public $timestamps = false;
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
 
     // 1. Hàm tự động tính Phần trăm giảm giá
     public function getDiscountPercentAttribute()

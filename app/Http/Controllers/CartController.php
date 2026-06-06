@@ -39,7 +39,7 @@ class CartController extends Controller
         // Lưu mảng $cart ngược lại vào Session
         session()->put('cart', $cart);
 
-        return redirect('/gio-hang')->with('success', 'Đã thêm ' . $product->name . ' vào giỏ hàng!');
+        return back()->with('success', 'Đã thêm ' . $product->name . ' vào giỏ hàng!');
     }
 
     // 2. Hiển thị Trang Giỏ hàng
@@ -55,6 +55,38 @@ class CartController extends Controller
         }
 
         return view('client.cart', compact('cart', 'total'));
+    }
+
+    public function updateQuantity(Request $request, $id)
+    {
+        $cart = session()->get('cart', []);
+
+        if (!isset($cart[$id])) {
+            return back()->with('error', 'Sản phẩm không tồn tại trong giỏ hàng!');
+        }
+
+        $action = $request->input('action');
+        $currentQuantity = (int) $cart[$id]['quantity'];
+
+        if ($action === 'increase') {
+            $quantity = $currentQuantity + 1;
+        } elseif ($action === 'decrease') {
+            $quantity = $currentQuantity - 1;
+        } else {
+            $quantity = (int) $request->input('quantity', $currentQuantity);
+        }
+
+        if ($quantity <= 0) {
+            unset($cart[$id]);
+            session()->put('cart', $cart);
+
+            return back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
+        }
+
+        $cart[$id]['quantity'] = $quantity;
+        session()->put('cart', $cart);
+
+        return back()->with('success', 'Đã cập nhật số lượng sản phẩm!');
     }
 
     // 3. Xóa sản phẩm khỏi giỏ hàng

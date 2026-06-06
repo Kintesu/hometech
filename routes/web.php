@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\WarehouseShipmentController;
 use App\Http\Controllers\Admin\InstallationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerAuthController;
+use App\Http\Controllers\WarrantyLookupController;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -27,6 +28,8 @@ use Carbon\Carbon;
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/san-pham/{id}', [HomeController::class, 'detail']);
 Route::get('/tim-kiem', [HomeController::class, 'search']);
+Route::get('/tra-cuu-bao-hanh', [WarrantyLookupController::class, 'index'])->name('warranty.lookup');
+Route::post('/tra-cuu-bao-hanh', [WarrantyLookupController::class, 'search'])->name('warranty.lookup.search');
 
 // Tài khoản khách hàng
 Route::get('/dang-nhap', [CustomerAuthController::class, 'showLoginForm'])->name('customer.login');
@@ -42,6 +45,7 @@ Route::middleware('auth')->group(function () {
 // Giỏ hàng
 Route::post('/gio-hang/them/{id}', [CartController::class, 'add']);
 Route::get('/gio-hang', [CartController::class, 'index']);
+Route::post('/gio-hang/cap-nhat/{id}', [CartController::class, 'updateQuantity']);
 Route::get('/gio-hang/xoa/{id}', [CartController::class, 'remove']);
 
 
